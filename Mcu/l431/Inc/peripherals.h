@@ -29,6 +29,7 @@ void initAfterJump(void);
 void initCorePeripherals(void);
 void SystemClock_Config(void);
 void MX_GPIO_Init(void);
+void initDebugGPIO(void);
 void MX_DMA_Init(void);
 // static void MX_ADC_Init(void);
 void MX_COMP1_Init(void);

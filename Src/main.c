@@ -872,8 +872,12 @@ WRITE_REG(RPM_PULSE_PORT->ODR, READ_REG(RPM_PULSE_PORT->ODR) ^ RPM_PULSE_PIN);
 #endif
 }
 
+// Called by COM_timer
 void PeriodElapsedCallback()
 {
+    // TODO remove this
+    LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);    // LED pin
+
     DISABLE_COM_TIMER_INT(); // disable interrupt
     commutate();
     commutation_interval = ((commutation_interval)+((lastzctime + thiszctime) >> 1))>>1;
@@ -891,6 +895,7 @@ void PeriodElapsedCallback()
     }
 }
 
+//Called by comparator interrupt handler
 void interruptRoutine()
 {
 //   if (average_interval > 125) {
@@ -905,6 +910,10 @@ void interruptRoutine()
 //            return;
 //        }
 //    }
+
+    // TODO remove this
+    // LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_1);    // ADC temp pin
+
         for (int i = 0; i < filter_level; i++) {
 #if defined(MCU_F031) || defined(MCU_G031)
             if (((current_GPIO_PORT->IDR & current_GPIO_PIN) == !(rising))) {
@@ -914,6 +923,10 @@ void interruptRoutine()
                 return;
             }
         }
+
+    // TODO remove this
+    LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_1);    // ADC temp pin
+
     __disable_irq();
     maskPhaseInterrupts();
     lastzctime = thiszctime;
@@ -1705,7 +1718,7 @@ int main(void)
     initCorePeripherals();
     enableCorePeripherals();
     loadEEpromSettings();
-
+    
     if (VERSION_MAJOR != eepromBuffer.version.major || VERSION_MINOR != eepromBuffer.version.minor || EEPROM_VERSION > eepromBuffer.eeprom_version) {
         eepromBuffer.version.major = VERSION_MAJOR;
         eepromBuffer.version.minor = VERSION_MINOR;
@@ -1713,6 +1726,32 @@ int main(void)
         saveEEpromSettings();
     }
     
+    //TODO Remove this
+//     eepromBuffer.comp_pwm = 1;
+//     eepromBuffer.variable_pwm = 1;
+
+//     eepromBuffer.stuck_rotor_protection = 0;//1;	//Causes input = 0; when this is 1
+//     eepromBuffer.advance_level = 2;//2;
+// //    eepromBuffer.auto_advance = 1;
+//     eepromBuffer.pwm_frequency = 24;//24;
+//     eepromBuffer.startup_power = 100;
+//     eepromBuffer.motor_kv = 1;//255;
+//     eepromBuffer.motor_poles = 1;//14;
+//     eepromBuffer.beep_volume = 5;
+//     eepromBuffer.servo.low_threshold = 128;
+//     eepromBuffer.servo.high_threshold = 128;
+//     eepromBuffer.servo.neutral = 128;
+//     eepromBuffer.servo.dead_band = 50;
+//     eepromBuffer.low_cell_volt_cutoff = 50;
+//     eepromBuffer.sine_mode_changeover_thottle_level = 15;
+//     eepromBuffer.drag_brake_strength = 10;
+//     eepromBuffer.driving_brake_strength = 10;
+//     eepromBuffer.limits.temperature = 141;
+//     eepromBuffer.limits.current = 102;
+//     eepromBuffer.sine_mode_power = 6;
+
+//     eepromBuffer.telemetry_on_interval = 1;
+
     if (eepromBuffer.dir_reversed == 1) {
         forward = 0;
     } else {

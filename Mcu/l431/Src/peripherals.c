@@ -24,6 +24,7 @@ void initCorePeripherals(void)
     NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),15, 0));
     SystemClock_Config();
     MX_GPIO_Init();
+    initDebugGPIO();
     MX_DMA_Init();
     MX_TIM1_Init();
     MX_TIM2_Init();
@@ -785,4 +786,38 @@ void enableCorePeripherals()
     NVIC_SetPriority(EXTI15_10_IRQn, 2);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
     EXTI->IMR1 |= (1 << 15);
+}
+
+void initDebugGPIO(void)
+{
+    LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+    /* GPIO Ports Clock Enable */
+    LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
+	LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
+
+    // LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_8);
+    // LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_5);
+    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_3);
+    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_1);
+
+    GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_3);
+
+    GPIO_InitStruct.Pin = LL_GPIO_PIN_1;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    // LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_1);
+    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_1);
+    // LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_1);
 }
